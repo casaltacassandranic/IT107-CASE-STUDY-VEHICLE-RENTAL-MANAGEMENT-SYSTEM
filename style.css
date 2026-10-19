@@ -7,7 +7,7 @@ body.homebg {
     background: #f4f4f4; /* or whatever color/image you want */
 }
 body.homebg {
-  background-image: url("../img/Background.png") !important;
+  background-image: url("Background.png") !important;
   background-size: cover;      
   background-position: center; 
   background-repeat: no-repeat;
