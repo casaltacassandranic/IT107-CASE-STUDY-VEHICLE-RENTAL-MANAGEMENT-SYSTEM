@@ -1,0 +1,241 @@
+<html>
+    <head>
+        <title>Vehicle Rental Management System</title>
+        <link href="style.css" rel="stylesheet">
+    </head>
+    <body>
+        <nav class="navbar">
+            <a href="index.html" class="logo">Logo</a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="vehicles.html">Vehicles & Rates</a>
+                <a href="bookings.html">Bookings</a>
+            </div>
+            <div class="profile-container">
+                <a href="index.html" class="profile-btn">Add Customer</a>
+            </div>
+        </nav>
+        <section>
+            <div class="vhs-rates">
+                <h1>Vehicles & Rates</h1>
+                <p class="addvhc"><input type="button" value=" +  Add Vehicle" onclick="newVehicle()"></p>
+            </div>
+            <div class="vehicle-container">
+                <div class="vehiclelist">
+                    <div class="vtitle">
+                        <h1>Vehicles</h1>
+                    </div>
+                    <div id="vehicleButtons"></div>
+                </div>
+                <div class="vehicledetails">
+                    <div class="vehicle1">
+                        <div class="vhcedit">
+                            <h1 id="formTitle">Add Vehicle</h1>
+                            <select id="status">
+                                <option value="Available">Available</option>
+                                <option value="Unavailable">Unavailable</option>
+                            </select>
+                        </div>
+                        <p>
+                            <label for="vname">Vehicle Name</label>
+                            <input type="text" id="vname">
+                        </p>
+                        <p>
+                            <label for="seaters">Seaters</label>
+                            <select id="seaters">
+                                <option value="5 Seaters">5 Seaters</option>
+                                <option value="7 Seaters">7 Seaters</option>
+                                <option value="9 Seaters">9 Seaters</option>
+                            </select>
+                            <label for="driver">Driver</label>
+                            <input type="text" id="driver">
+                        </p>
+                        <p>
+                            <label for="vtype">Vehicle Type</label>
+                            <select id="vtype">
+                                <option value="Subcompact multi-purpose vehicle (MPV)">Subcompact multi-purpose vehicle (MPV)</option>
+                                <option value="Subcompact Sedan">Subcompact Sedan</option>
+                                <option value="Sport Utility Vehicle (SUV)">Sport Utility Vehicle (SUV)</option>
+                            </select>
+                        </p>
+                        <p>
+                            <label for="rrate">Rental Rate (₱)</label>
+                            <input type="number" id="rrate" min="0">
+                            <label for="duration">Duration</label>
+                            <input type="text" id="duration" placeholder="e.g. 8 to 10 hrs">
+                        </p>
+                        <p>
+                            <input type="button" value="Edit" onclick="editvehicle()">
+                            <input type="button" value="Add Vehicle" onclick="addvehicle()">
+                            <input type="button" value="Delete" onclick="deletevehicle()">
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <script>
+            // load saved data
+            var savedData = localStorage.getItem("vehicles_db");
+            var car;
+
+            if (savedData == null) {
+                // first time: start with your three vehicles
+                car = [
+                    {
+                        name: "2019 Toyota Avanza Black", status: "Available",
+                        seaters: "7 Seaters", driver: "Gregorio P. Colagbang",
+                        vtype: "Subcompact multi-purpose vehicle (MPV)",
+                        rate: 1700, duration: "8 to 10 hrs"
+                    },
+                    {
+                        name: "2019 Toyota Avanza Gray", status: "Available",
+                        seaters: "7 Seaters", driver: "",
+                        vtype: "Subcompact multi-purpose vehicle (MPV)",
+                        rate: 1700, duration: "8 to 10 hrs"
+                    },
+                    {
+                        name: "Toyota Vios", status: "Available",
+                        seaters: "5 Seaters", driver: "",
+                        vtype: "Subcompact Sedan",
+                        rate: 1500, duration: "8 to 10 hrs"
+                    }
+                ];
+                saveCars();
+            } else {
+                car = JSON.parse(savedData);
+            }
+
+            var selectedIndex = -1; // -1 = no vehicle selected
+
+            function saveCars() {
+                localStorage.setItem("vehicles_db", JSON.stringify(car));
+            }
+
+            // build the vehicle list buttons
+            function displayList() {
+                var box = document.getElementById("vehicleButtons");
+                box.innerHTML = "";
+
+                for (var i = 0; i < car.length; i++) {
+                    var btn = document.createElement("input");
+                    btn.type = "button";
+                    btn.value = car[i].name;
+                    btn.setAttribute("onclick", "displayDetails(" + i + ")");
+                    box.appendChild(btn);
+                }
+            }
+
+            // show the selected vehicle in the form
+            function displayDetails(index) {
+                selectedIndex = index;
+                var c = car[index];
+
+                document.getElementById("formTitle").textContent = c.name;
+                document.getElementById("vname").value = c.name;
+                document.getElementById("status").value = c.status;
+                document.getElementById("seaters").value = c.seaters;
+                document.getElementById("driver").value = c.driver;
+                document.getElementById("vtype").value = c.vtype;
+                document.getElementById("rrate").value = c.rate;
+                document.getElementById("duration").value = c.duration;
+            }
+
+            // read + validate the form, returns a vehicle object or null
+            function readForm() {
+                var name = document.getElementById("vname").value.trim();
+                var rate = document.getElementById("rrate").value;
+
+                if (name === "") {
+                    alert("Please enter the vehicle name.");
+                    return null;
+                }
+                if (rate === "" || Number(rate) <= 0) {
+                    alert("Please enter a valid rental rate.");
+                    return null;
+                }
+
+                return {
+                    name: name,
+                    status: document.getElementById("status").value,
+                    seaters: document.getElementById("seaters").value,
+                    driver: document.getElementById("driver").value.trim(),
+                    vtype: document.getElementById("vtype").value,
+                    rate: Number(rate),
+                    duration: document.getElementById("duration").value.trim()
+                };
+            }
+
+            // top "+ Add Vehicle" button: clear the form for a new entry
+            function newVehicle() {
+                selectedIndex = -1;
+                document.getElementById("formTitle").textContent = "Add Vehicle";
+                document.getElementById("vname").value = "";
+                document.getElementById("status").value = "Available";
+                document.getElementById("seaters").value = "5 Seaters";
+                document.getElementById("driver").value = "";
+                document.getElementById("vtype").selectedIndex = 0;
+                document.getElementById("rrate").value = "";
+                document.getElementById("duration").value = "";
+                document.getElementById("vname").focus();
+            }
+
+            // bottom "Add Vehicle" button: save the form as a new vehicle
+            function addvehicle() {
+                var v = readForm();
+                if (v === null) return;
+
+                car.push(v);
+                saveCars();
+                displayList();
+                displayDetails(car.length - 1);
+                alert("Vehicle added successfully.");
+            }
+
+            // "Edit" button: update the selected vehicle
+            function editvehicle() {
+                if (selectedIndex === -1) {
+                    alert("Please select a vehicle from the list first.");
+                    return;
+                }
+
+                var v = readForm();
+                if (v === null) return;
+
+                car[selectedIndex] = v;
+                saveCars();
+                displayList();
+                displayDetails(selectedIndex);
+                alert("Vehicle updated successfully.");
+            }
+
+            // "Delete" button: remove the selected vehicle
+            function deletevehicle() {
+                if (selectedIndex === -1) {
+                    alert("Please select a vehicle from the list first.");
+                    return;
+                }
+
+                if (confirm("Are you sure you want to delete " + car[selectedIndex].name + "?")) {
+                    car.splice(selectedIndex, 1);
+                    saveCars();
+                    displayList();
+
+                    if (car.length > 0) {
+                        displayDetails(0);
+                    } else {
+                        newVehicle();
+                    }
+                    alert("Vehicle deleted successfully.");
+                }
+            }
+
+            // run on page load
+            displayList();
+            if (car.length > 0) {
+                displayDetails(0);
+            } else {
+                newVehicle();
+            }
+        </script>
+    </body>
+</html>
