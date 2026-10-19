@@ -1,0 +1,226 @@
+<html>
+    <head>
+        <title>Vehicle Rental Management System</title>
+        <link href="css/style.css" rel="stylesheet">
+    </head>
+    <body class="homebg">
+        <nav class="navbar">
+            <a href="index.html" class="logo">Logo</a>
+            <div class="nav-links">
+                <a href="index.html">Home</a> 
+                <a href="vehicles.html">Vehicles & Rates</a>
+                <a href="bookings.html">Bookings</a>
+            </div>
+           <div class="profile-container">
+                <a href="index.html" class="profile-btn">Add Customer</a>
+            </div>
+        </nav>
+        <section>
+        <div class="hero">
+            <h1>Renter Details</h1>
+            <form>
+                <div class="date-time">
+                    <p>
+                        <label for="pckpdate-time">Pick-up Date/Time</label>
+                        <span class="dt-pair">
+                            <input type="date" id="pckpdate" required>
+                            <input type="time" id="pckptime" required>
+                        </span>
+                    </p>
+                    <p>
+                        <label for="rtrndate-time">Return Date/Time</label>
+                        <span class="dt-pair">
+                            <input type="date" id="rtrndate" required>
+                            <input type="time" id="rtrntime" required>
+                        </span>
+                    </p>
+                </div>
+                <div class="location">
+                    <p>
+                        <label for="pickuploc">Pickup Location</label>
+                        <select id="pickuploc" required>
+                            <option value="0">Please select location</option>
+                            <option value="Manila">Manila</option>
+                            <option value="Makati">Makati</option>
+                            <option value="Pasig">Pasig</option>
+                            <option value="Quezon City">Quezon City</option>
+                        </select>
+                    </p>
+                    <p>
+                        <label for="returnloc">Return Location</label>
+                        <select id="returnloc" required>
+                            <option value="0">Please select location</option>
+                            <option value="Manila">Manila</option>
+                            <option value="Makati">Makati</option>
+                            <option value="Pasig">Pasig</option>
+                            <option value="Quezon City">Quezon City</option>
+                        </select>
+                    </p>
+                </div>
+                <p class="same-loc">
+                    <label for="return-loc">
+                    <input type="checkbox" id="sameloc">Same as Pick-up Location</label>
+                </p>
+                <div class="c-details">
+                    <p>
+                        <label for="c_name">Name</label>
+                        <input type="text" id="name" required>
+                    </p>
+                    <p>
+                        <label for="c_email">Email</label>
+                        <input type="email" id="email" required>
+                    </p>
+                    <p>
+                        <label for="c_number">Number</label>
+                        <input type="text" id="cnum" required>
+                    </p>
+                </div>
+                <div class="addcustomer">
+                    <input type="button" value="Add Customer" onclick="addcustomer()">
+                </div>
+            </form>
+        </div>
+ 
+        </section>
+        <p id="output"></p>
+        <script type="text/javascript">
+
+            //saving data
+            var savedData = localStorage.getItem("renting_db");
+              if (savedData == null) {
+            
+            var customer = [];
+ 
+            localStorage.setItem(
+                "renting_db",
+                JSON.stringify(customer)
+            );
+ 
+            } else {
+ 
+            var customer = JSON.parse(savedData);
+ 
+            }
+
+            //add custmer data
+            function addcustomer(){
+                var pckpdate = document.getElementById("pckpdate").value;
+                    if (pckpdate===""){
+                    alert("Please select Pick-up Date.");
+                    return;
+                    }
+
+                var pckptime = document.getElementById("pckptime").value;
+                    if (pckptime===""){
+                    alert("Please select Pick-up Time.");
+                    return;
+                    }
+
+                var rtrndate = document.getElementById("rtrndate").value;
+                    if (rtrndate===""){
+                    alert("Please select Return Date.");
+                    return;
+                    }
+
+                var rtrntime = document.getElementById("rtrntime").value;
+                    if (rtrntime===""){
+                    alert("Please select Return Time.");
+                    return;
+                    }
+
+                var pickuploc = document.getElementById("pickuploc").value;
+                    if (pickuploc==="0"){
+                    alert("Please select Pickup-Location.");
+                    return;
+                    }
+
+                var returnloc = document.getElementById("returnloc").value;
+                    if (returnloc==="0"){
+                    alert("Please select Return Location.");
+                    return;
+                    }
+
+                var sameloc = document.getElementById("sameloc").value;
+
+                var name = document.getElementById("name").value;
+                    if (name===""){
+                    alert("Please enter the name.");
+                    return;
+                    }
+
+                var email = document.getElementById("email").value;
+                    if (email===""){
+                    alert("Please select your Pick-up Date.");
+                    return;
+                    }
+        
+                var cnum = document.getElementById("cnum").value;
+                    if (cnum===""){
+                    alert("Please enter phone number.");
+                    return;
+                    }
+                
+                //add the customer data in db
+                customer.push({
+                    name: name,
+                    email: email,
+                    cnum: cnum,
+                    pckpdate: pckpdate,
+                    pckptime: pckptime,
+                    rtrndate: rtrndate,
+                    rtrntime: rtrntime,
+                    pickuploc: pickuploc,
+                    returnloc: returnloc
+                });
+                
+                localStorage.setItem(
+                    "renting_db",
+                    JSON.stringify(customer)
+                );
+                clearForm();
+                alert("Customer added successfully.");
+
+                document.getElementById("message").innerHTML =
+                "Customer added successfully.";
+
+                //duration bago pumunta sa bookings list
+                setTimeout(function() {
+                    window.location.href = "bookings.html";
+                }, 800);
+
+                clearForm();
+
+            }
+
+            //clear the forms after the customer was added
+            function clearForm() {
+                document.getElementById("pckpdate").value = "";
+                document.getElementById("pckptime").value = "";
+                document.getElementById("rtrndate").value = "";
+                document.getElementById("rtrntime").value = "";
+                document.getElementById("pickuploc").value = "0";
+                document.getElementById("returnloc").value = "0";
+                document.getElementById("name").value = "";
+                document.getElementById("email").value = "";
+                document.getElementById("cnum").value = "";
+                document.getElementById("sameloc").checked = false;
+            }
+
+            document.getElementById("sameloc").addEventListener("change", function() {
+            var pickuploc = document.getElementById("pickuploc");
+            var returnloc = document.getElementById("returnloc");
+
+            if (this.checked) {
+            //copy the pickup location 
+                returnloc.value = pickuploc.value;
+                returnloc.disabled = true;
+            } else {
+            //pipili ng return location
+                returnloc.disabled = false;
+                returnloc.value = "0";
+            }
+            });
+
+        </script>
+    </body>
+</html>

@@ -1,0 +1,163 @@
+<html>
+    <head>
+        <title>Vehicle Rental Management System</title>
+        <link href="css/style.css" rel="stylesheet">
+    </head>
+    <body>
+        <nav class="navbar">
+            <a href="index.html" class="logo">Logo</a>
+            <div class="nav-links">
+                <a href="index.html">Home</a> 
+                <a href="vehicles.html">Vehicles & Rates</a>
+                <a href="bookings.html">Bookings</a>
+            </div>
+            <div class="profile-container">
+                <a href="index.html" class="profile-btn">Add Customer</a>
+            </div>
+        </nav>
+
+        <section>
+            <div class="page-renter">
+                <div class="title-renter">
+                    <h1>Renters</h1>
+                    <p><input type="text" id="searchbar" placeholder="Search..." oninput="search()"></p>
+                </div>
+
+                <div class="table-container">
+                    <table id="renterTable" border="1" cellpadding="8">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Number</th>
+                            <th>Pick-up Date/Time</th>
+                            <th>Return Date/Time</th>
+                            <th>Pick-up Location</th>
+                            <th>Return Location</th>
+                            <th>Price</th>
+                            <th>Manage</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customerTable"></tbody>
+                    </table>
+                </div>
+            </div>
+            </section>
+
+    <script type="text/javascript">
+        var savedData = localStorage.getItem("renting_db");
+        var customer = savedData ? JSON.parse(savedData) : [];
+
+        function displaycustomer() {
+            var table = "";
+            for (var i = 0; i < customer.length; i++) {
+                table += "<tr>";
+                table += "<td>" + customer[i].name + "</td>";
+                table += "<td>" + customer[i].email + "</td>";
+                table += "<td>" + customer[i].cnum + "</td>";
+                table += "<td>" + customer[i].pckpdate + " / " + formatTime(customer[i].pckptime) + "</td>";
+                table += "<td>" + customer[i].rtrndate + " / " + formatTime(customer[i].rtrntime) + "</td>";
+                table += "<td>" + customer[i].price + "</td>";
+                table += "<td>" + customer[i].pickuploc + "</td>";
+                table += "<td>" + customer[i].returnloc + "</td>";
+
+                table += "<td>";
+ 
+                table += "<a href='edit.html?edit=" + i + "'>";
+                table += "<input type='button' value='Edit'>";
+                table += "</a> ";
+
+                table += "<input type='button' value='Delete' ";
+                table += "onclick='deleteCustomer(" + i + ")'>";
+ 
+                table += "</td>";
+ 
+                table += "</tr>";
+            }
+            document.getElementById("customerTable").innerHTML = table;
+        }
+        function formatTime(time) {
+            if (!time) return "";
+                var parts = time.split(":");
+                var hours = parseInt(parts[0], 10);
+                var minutes = parts[1];
+                var suffix = hours >= 12 ? "PM" : "AM";
+                hours = hours % 12;
+            if (hours === 0) hours = 12;
+                return hours + ":" + minutes + " " + suffix;
+            }
+
+        displaycustomer();
+
+        function deleteCustomer(index) {
+ 
+            var answer = confirm(
+                "Are you sure you want to delete " +
+                customer[index].name + "?"
+            );
+ 
+            if (answer == true) {
+ 
+                customer.splice(index, 1);
+ 
+                localStorage.setItem(
+                    "renting_db",
+                    JSON.stringify(customer)
+                );
+                displaycustomer();
+                alert("Customer deleted successfully.");
+ 
+                document.getElementById("message").innerHTML =
+                    "Customer deleted successfully.";
+ 
+                displaycustomer();
+ 
+            } else {
+ 
+                alert("Delete cancelled.");
+ 
+            }
+        }
+        var editIndex = -1;
+        function editCustomer(index) {
+
+            alert("You selected Edit.");
+ 
+            editIndex = index;
+            
+            var c = customer[index];
+            var newpckpdate = prompt("Edit pickup date:", c.pickupdt);
+            if (newpckpdate !== null) {
+                c.pickupdt = newpckpdate;
+                localStorage.setItem("renting_db", JSON.stringify(customer));
+                displaycustomer();
+
+ 
+            // Change Add Student button to Update Student
+            document.getElementById("studentButton").value =
+                "Update Student";
+ 
+            document.getElementById("studentButton").onclick =
+                updateStudent;
+ 
+            document.getElementById("message").innerHTML =
+                "You are editing: " + students[index].name;
+            }
+        }
+
+        function search() {
+        var input = document.getElementById("searchbar").value.toLowerCase();
+        var rows = document.querySelectorAll("#renterTable tbody tr");
+
+        rows.forEach(function(row) {
+            var name = row.cells[0].textContent.toLowerCase();  // first column = NAME
+            if (name.includes(input)) {
+                row.style.display = "";      // show
+            } else {
+                row.style.display = "none";  // hide
+            }
+        });
+        }
+    </script>
+    </body>
+</html>
